@@ -144,8 +144,12 @@ git init
 #clonen van dashboard en archief applicatie
 git clone https://github.com/syncyberE4/html.git
 
+cd /home/administrator
+
 #verplaatsen van dashboard applicatie
 mv /var/www/html/live-overzicht/* /var/www/dashboard/
+
+cd /home/administrator
 
 #verplaatsen van archief
 mv /var/www/html/archief-overzicht/* /var/www/archief
@@ -163,6 +167,19 @@ chmod 777 /var/www/Front_end
 #rechten geven op alle mappen in de www directory
 cd /var/www/
 chmod 777 ./*
+
+#rechten geven op de juiste mappen
+sudo chmod 777 /var/www/archief/api
+sudo chmod 777 /var/www/archief/fonts
+sudo chmod 777 /var/www/archief/index.html
+sudo chmod 777 /var/www/archief/js
+sudo chmod 777 /var/www/archief/sass
+
+sudo chmod 777 /var/www/dashboard/api
+sudo chmod 777 /var/www/dashboard/fonts
+sudo chmod 777 /var/www/dashboard/index.html
+sudo chmod 777 /var/www/dashboard/js
+sudo chmod 777 /var/www/dashboard/sass
 
 #na het schrijven apache herstarten
 sudo service apache2 restart
