@@ -118,6 +118,9 @@ sudo rm /etc/automysqlbackup/myserver.conf
 sudo rm /etc/mysql/mysql.conf.d/mysqld.cnf
 
 #mappen aanmaken + rechten geven
+sudo rm -r /var/www/dashboard
+sudo rm -r /var/www/archif
+
 sudo mkdir /var/www/dashboard
 sudo chmod 777 /var/www/dashboard
 
