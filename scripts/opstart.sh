@@ -69,7 +69,7 @@ sudo chown -R administrator:administrator /media/backup
 
 
 #add a virtual host to apache2
-sudo bash -c 'echo -e "<VirtualHost *:80> \n\n DocumentRoot /var/www/Front_end \n ErrorLog ${APACHE_LOG_DIR}/error.log \n CustomLog ${APACHE_LOG_DIR}/access.log combined \n\n <Directory /var/www/Front_end> \n RewriteEngine on \n\n RewriteCond %{REQUEST_FILENAME} -f [OR] \n RewriteCond %{REQUEST_FILENAME} -d \n RewriteRule ^ - [L] \n\n RewriteRule ^ index.html [L] \n </Directory> \n\n </VirtualHost>\n\n<VirtualHost *:8050> \n\n DocumentRoot /var/www/dashboard \n ErrorLog /error.log\n CustomLog /access.log combined\n\n</VirtualHost>\n\n<VirtualHost *:8051>\n DocumentRoot /var/www/archief\n ErrorLog /error.log\n CustomLog /access.log combined"' > /etc/apache2/sites-available/syncyber.com.conf
+sudo bash -c 'echo -e "<VirtualHost *:80> \n\n DocumentRoot /var/www/Front_end \n ErrorLog ${APACHE_LOG_DIR}/error.log \n CustomLog ${APACHE_LOG_DIR}/access.log combined \n\n <Directory /var/www/Front_end> \n RewriteEngine on \n\n RewriteCond %{REQUEST_FILENAME} -f [OR] \n RewriteCond %{REQUEST_FILENAME} -d \n RewriteRule ^ - [L] \n\n RewriteRule ^ index.html [L] \n </Directory> \n\n </VirtualHost>\n\n<VirtualHost *:8050> \n\n DocumentRoot /var/www/dashboard \n ErrorLog /error.log\n CustomLog /access.log combined\n\n</VirtualHost>\n\n<VirtualHost *:8051>\n DocumentRoot /var/www/archief\n ErrorLog /error.log\n CustomLog /access.log combined\n</VirtualHost>"' > /etc/apache2/sites-available/syncyber.com.conf
 
 sudo a2dissite 000-default.conf
 sudo rm /etc/apache2/sites-available/000-default.conf
@@ -108,7 +108,7 @@ crontab -l | { cat; echo "47 10 * * * /usr/local/bin/automysqlbackup /etc/automy
 crontab -l | { cat; echo "22 11 * * * /home/administrator/backup/backup.sh"; } | crontab -
 
 #ports apache instellen
-sudo bash -c 'echo -e "Listen 8050 \nListen 80\n Listen 8051"' >> /etc/apache2/ports.conf
+sudo bash -c 'echo -e "Listen 8050\nListen 80\nListen 8051"' >> /etc/apache2/ports.conf
 
 #de nodige files verwijderen
 sudo rm /etc/automysqlbackup/myserver.conf
@@ -129,6 +129,9 @@ wget https://raw.githubusercontent.com/LambrechtsLouis/syncyberTest/master/etc/a
 cd /etc/mysql/mysql.conf.d
 wget https://raw.githubusercontent.com/LambrechtsLouis/syncyberTest/master/etc/mySQL/mysql/mysqld.cnf
 
+cd /home/administrator
+git clone https://github.com/syncyberE4/Applicatie.git
+
 cd /var/www
 git init
 
@@ -136,7 +139,7 @@ git init
 git clone https://github.com/syncyberE4/html.git
 
 #verplaatsen van dashboard applicatie
-mv /var/www/html/live-overzicht/* /var/www/dahsboard/
+mv /var/www/html/live-overzicht/* /var/www/dashboard/
 
 #verplaatsen van archief
 mv /var/www/html/archief-overzicht/* /var/www/archief
