@@ -107,8 +107,11 @@ sudo chmod u+x /home/administrator/backup/backup.sh
 crontab -l | { cat; echo "47 10 * * * /usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf"; } | crontab -
 crontab -l | { cat; echo "22 11 * * * /home/administrator/backup/backup.sh"; } | crontab -
 
+sudo rm -r /etc/apache2/ports.conf
+sudo touch /etc/apache2/ports.conf
+
 #ports apache instellen
-sudo bash -c 'echo -e "Listen 8050\nListen 80\nListen 8051"' >> /etc/apache2/ports.conf
+sudo bash -c 'echo -e "<ifModule ssl_module>\n	Listen 443\n</ifModule mod_gnutls.c>\n	Listen 443\n</ifModule>\n\nListen 8050\nListen 80\nListen 8051"' >> /etc/apache2/ports.conf
 
 #de nodige files verwijderen
 sudo rm /etc/automysqlbackup/myserver.conf
