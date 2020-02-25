@@ -132,6 +132,12 @@ wget https://raw.githubusercontent.com/LambrechtsLouis/syncyberTest/master/etc/m
 cd /home/administrator
 git clone https://github.com/syncyberE4/Applicatie.git
 
+mkdir publish
+chmod 777 publish
+mv Applicatie/publish/* publish
+chmod 777 /home/administrator/publish/*
+rm -r /home/administrator/Applicatie
+
 cd /var/www
 git init
 
