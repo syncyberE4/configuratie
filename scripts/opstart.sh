@@ -216,3 +216,4 @@ sudo ufw allow out 443
 sudo ufw allow out 3306
 
 sudo ufw enable
+
