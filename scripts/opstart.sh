@@ -111,7 +111,7 @@ sudo rm -r /etc/apache2/ports.conf
 sudo touch /etc/apache2/ports.conf
 
 #ports apache instellen
-sudo bash -c 'echo -e "<ifModule ssl_module>\n	Listen 443\n</ifModule mod_gnutls.c>\n	Listen 443\n</ifModule>\n\nListen 8050\nListen 80\nListen 8051"' >> /etc/apache2/ports.conf
+sudo bash -c 'echo -e "<ifModule ssl_module>\n	Listen 443\n</ifModule>\n<ifModule mod_gnutls.c>\n	Listen 443\n</ifModule>\n\nListen 8050\nListen 80\nListen 8051"' >> /etc/apache2/ports.conf
 
 #de nodige files verwijderen
 sudo rm /etc/automysqlbackup/myserver.conf
