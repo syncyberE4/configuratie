@@ -1,5 +1,4 @@
 #!/bin/bash
-
 sudo apt-get update -y
 sudo apt-get upgrade -y
 
@@ -30,10 +29,15 @@ FLUSH PRIVILEGES;
 CREATE DATABASE syncyber;
 CREATE USER 'administrator'@'localhost' IDENTIFIED BY 'R1234-56'; 
 GRANT ALL PRIVILEGES ON *.* TO 'administrator'@'localhost' WITH GRANT OPTION;
+
 CREATE USER 'applicatie'@'localhost' IDENTIFIED BY 'applicatie'; 
 GRANT ALL PRIVILEGES ON *.* TO 'applicatie'@'localhost' WITH GRANT OPTION;
-CREATE USER 'microcontroller'@'localhost' IDENTIFIED BY 'microcontroller'; 
+
+CREATE USER 'microcontroller'@'localhost' IDENTIFIED BY 'microcontroller';
 GRANT ALL PRIVILEGES ON *.* TO 'microcontroller'@'localhost' WITH GRANT OPTION;
+
+CREATE USER 'gregory'@'%' IDENTIFIED BY 'badmuts'; 
+GRANT ALL PRIVILEGES ON *.* TO 'gregory'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
@@ -42,6 +46,7 @@ sudo apt-get install php libapache2-mod-php -y
 #Give rights to apache www folder 
 sudo mkdir /var/www/ 
 sudo chmod -R 777 /var/www/
+sudo chmod -R 777 /var/www/html
 
 #installatie van PHPMyAdmin
 sudo apt install phpmyadmin php-mbstring php-gettext -y
@@ -54,35 +59,17 @@ sudo systemctl restart apache2
 sudo a2enmod rewrite -y
 sudo systemctl restart apache2
 
-#installeer python
-sudo apt-get install python3 -y
-
-#installeer pip
-sudo apt-get install python3-pip -y
-
-#installeer flask
-pip3 install Flask
-
-#installeer DASH
-pip3 install dash
-
-#install mysql connector
-pip3 install mysql-connector
-
 #mappen aanmaken
-sudo mkdir /home/administrator/dashboard
-sudo chmod -R 777 /home/administrator/dashboard
 sudo mkdir /home/administrator/backup
 sudo chmod -R 777 /home/administrator/backup
 
 #create mount point for usb
-sudo mkdir /media/usb
-sudo chown -R administrator:administrator /media/usb
+sudo mkdir /media/backup
+sudo chown -R administrator:administrator /media/backup
 
 
 #add a virtual host to apache2
-sudo bash -c 'echo -e "<VirtualHost *:80> \n\n DocumentRoot /var/www/html \n ErrorLog ${APACHE_LOG_DIR}/error.log \n CustomLog ${APACHE_LOG_DIR}/access.log combined \n\n <Directory /var/www/html> \n RewriteEngine on \n\n RewriteCond %{REQUEST_FILENAME} -f [OR] \n RewriteCond %{REQUEST_FILENAME} -d \n RewriteRule ^ - [L] \n\n RewriteRule ^ index.html [L] \n </Directory> \n\n </VirtualHost>"' > /etc/apache2/sites-available/syncyber.com.conf
-#enable the new site and restart apache2 + remove 000-default.conf
+sudo bash -c 'echo -e "<VirtualHost *:80> \n\n DocumentRoot /var/www/Front_end \n ErrorLog ${APACHE_LOG_DIR}/error.log \n CustomLog ${APACHE_LOG_DIR}/access.log combined \n\n <Directory /var/www/Front_end> \n RewriteEngine on \n\n RewriteCond %{REQUEST_FILENAME} -f [OR] \n RewriteCond %{REQUEST_FILENAME} -d \n RewriteRule ^ - [L] \n\n RewriteRule ^ index.html [L] \n </Directory> \n\n </VirtualHost>\n\n<VirtualHost *:8050> \n\n DocumentRoot /var/www/dashboard \n ErrorLog /error.log\n CustomLog /access.log combined\n\n</VirtualHost>\n\n<VirtualHost *:8051>\n DocumentRoot /var/www/archief\n ErrorLog /error.log\n CustomLog /access.log combined"' > /etc/apache2/sites-available/syncyber.com.conf
 
 sudo a2dissite 000-default.conf
 sudo rm /etc/apache2/sites-available/000-default.conf
@@ -95,6 +82,8 @@ sudo service apache2 restart
 sudo aptitude install automysqlbackup autopostgresqlbackup -y
 mkdir /opt/automysqlbackup
 cd /opt/automysqlbackup/
+mkdir /var/backup/
+chmod 777 /var/backup
 wget http://ufpr.dl.sourceforge.net/project/automysqlbackup/AutoMySQLBackup/AutoMySQLBackup%20VER%203.0/automysqlbackup-v3.0_rc6.tar.gz
 tar zxf automysqlbackup-v3.0_rc6.tar.gz
 sudo ./install.sh
@@ -102,7 +91,96 @@ cd /etc/automysqlbackup/
 #nano myserver.conf aanpassen van de instellingen aan de database
 
 #schrijven en aanmaken van backupscript
-sudo bash -c 'echo -e "#!/bin/bash\nbackup_files=\"/home /var /etc \"\ndest=\"/media/usb/backup \"\nday=\$(date+%A)\nhostname=\$(hostname -s)\narchive_file=\"\$hostname-\$day.tgz\"\necho \"Backing up \$backup_files to \$dest/\$archive_file \"\ntar czf \$dest/\$archive_file \$backup_files \n echo \"backup finished\"\nls -lh \$dest"' > /home/administrator/backup/backup.sh
+sudo bash -c 'echo -e "#!/bin/bash\nbackup_files=\"/home /var /etc \"\ndest=\"/media/backup\"\nday=\$(date+%A)\nhostname=\$(hostname -s)\narchive_file=\"\$hostname-\$day.tgz\"\necho \"Backing up \$backup_files to \$dest/\$archive_file \"\ntar czf \$dest/\$archive_file \$backup_files \n echo \"backup finished\"\nls -lh \$dest"' > /home/administrator/backup/backup.sh
+
+
+#crontabfile instellen
+sudo bash -c 'echo -e "22 11	* * *	root	/home/administrator/backup/backup.sh\n39 10	* * *	root	/usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf"' > /etc/crontab
+#sudo bash -c 'echo -e "39 10	* * *	root	/usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf"' > /etc/crontab
 
 alias backup='sudo /home/administrator/backup/backup.sh'
 sudo chmod u+x /home/administrator/backup/backup.sh
+
+
+
+#crontab -e instellen
+crontab -l | { cat; echo "47 10 * * * /usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf"; } | crontab -
+crontab -l | { cat; echo "22 11 * * * /home/administrator/backup/backup.sh"; } | crontab -
+
+#ports apache instellen
+sudo bash -c 'echo -e "Listen 8050 \nListen 80\n Listen 8051"' >> /etc/apache2/ports.conf
+
+#de nodige files verwijderen
+sudo rm /etc/automysqlbackup/myserver.conf
+sudo rm /etc/mysql/mysql.conf.d/mysqld.cnf
+
+#mappen aanmaken + rechten geven
+sudo mkdir /var/www/dashboard
+sudo chmod 777 /var/www/dashboard
+
+sudo mkdir /var/www/archief
+sudo chmod 777 /var/www/archief
+
+
+#de juiste bestanden op de juiste plaats zetten
+cd /etc/automysqlbackup
+wget https://raw.githubusercontent.com/LambrechtsLouis/syncyberTest/master/etc/automysqlbackup/myserver.conf
+
+cd /etc/mysql/mysql.conf.d
+wget https://raw.githubusercontent.com/LambrechtsLouis/syncyberTest/master/etc/mySQL/mysql/mysqld.cnf
+
+cd /var/www
+git init
+
+#clonen van dashboard en archief applicatie
+git clone https://github.com/syncyberE4/html.git
+
+#verplaatsen van dashboard applicatie
+mv /var/www/html/live-overzicht/* /var/www/dahsboard/
+
+#verplaatsen van archief
+mv /var/www/html/archief-overzicht/* /var/www/archief
+
+#verwijderen dubbele bestanden
+rm -r /var/www/html
+
+cd /var/www
+
+#clonen van frontend
+git clone https://github.com/syncyberE4/Front_end.git
+
+chmod 777 /var/www/Front_end
+
+#rechten geven op alle mappen in de www directory
+cd /var/www/
+chmod 777 ./*
+
+#na het schrijven apache herstarten
+sudo service apache2 restart
+
+#instellen van firewall rules
+sudo apt-get install ufw
+
+sudo ufw disable
+
+sudo ufw default deny incoming
+sudo ufw default deny outgoing
+
+sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT\n-A ufw-before-output -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT"' >> /etc/ufw/before.rules
+
+sudo ufw allow 22/tcp
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw allow 8050
+sudo ufw allow 5000:5001/tcp
+sudo ufw allow 5000:5001/udp
+sudo ufw allow 3306/udp
+sudo ufw allow 3306/tcp
+
+sudo ufw allow out 8050
+sudo ufw allow out 80
+sudo ufw allow out 443
+sudo ufw allow out 3306
+
+sudo ufw enable
