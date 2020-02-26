@@ -156,6 +156,7 @@ sudo systemctl enable back_end.service
 sudo systemctl daemon-reload
 sudo systemctl start back_end.service
 
+cp -r /home/administrator/configuratie/scripts/back_end.service /lib/systemd/system/back_end.service
 
 #de juiste bestanden op de juiste plaats zetten
 cd /etc/automysqlbackup
@@ -226,3 +227,4 @@ sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLI
 
 sudo ufw enable
 
+sudo reboot now
