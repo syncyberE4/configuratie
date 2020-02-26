@@ -33,7 +33,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'administrator'@'localhost' WITH GRANT OPTION;
 CREATE USER 'applicatie'@'localhost' IDENTIFIED BY 'applicatie'; 
 GRANT ALL PRIVILEGES ON *.* TO 'applicatie'@'localhost' WITH GRANT OPTION;
 
-CREATE USER 'microcontroller'@'localhost' IDENTIFIED BY 'microcontroller';
+CREATE USER 'microcontroller'@'localhost' IDENTIFIED BY '071RMphIJmkFUR21#';
 GRANT ALL PRIVILEGES ON *.* TO 'microcontroller'@'localhost' WITH GRANT OPTION;
 
 CREATE USER 'gregory'@'%' IDENTIFIED BY 'badmuts'; 
@@ -46,7 +46,7 @@ sudo apt-get install php libapache2-mod-php -y
 #Give rights to apache www folder 
 sudo mkdir /var/www/ 
 sudo chmod -R 777 /var/www/
-sudo chmod -R 777 /var/www/html
+
 
 #installatie van PHPMyAdmin
 sudo apt install phpmyadmin php-mbstring php-gettext -y
@@ -101,7 +101,28 @@ sudo bash -c 'echo -e "22 11	* * *	root	/home/administrator/backup/backup.sh\n39
 alias backup='sudo /home/administrator/backup/backup.sh'
 sudo chmod u+x /home/administrator/backup/backup.sh
 
+#firewallrules instellen
+sudo apt-get install ufw
 
+sudo ufw disable
+
+sudo ufw default deny incoming
+sudo ufw default deny outgoing
+
+sudo ufw allow 22/tcp
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw allow 8050
+sudo ufw allow 5000:5001/tcp
+sudo ufw allow 5000:5001/udp
+sudo ufw allow 3306/udp
+sudo ufw allow 3306/tcp
+
+sudo ufw allow out 8050
+sudo ufw allow out 80
+sudo ufw allow out 443
+sudo ufw allow out 3306
 
 #crontab -e instellen
 crontab -l | { cat; echo "47 10 * * * /usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf"; } | crontab -
@@ -119,7 +140,8 @@ sudo rm /etc/mysql/mysql.conf.d/mysqld.cnf
 
 #mappen aanmaken + rechten geven
 sudo rm -r /var/www/dashboard
-sudo rm -r /var/www/archif
+sudo rm -r /var/www/archief
+sudo rm -r /var/www/Front_end
 
 sudo mkdir /var/www/dashboard
 sudo chmod 777 /var/www/dashboard
@@ -136,6 +158,8 @@ cd /etc/mysql/mysql.conf.d
 wget https://raw.githubusercontent.com/LambrechtsLouis/syncyberTest/master/etc/mySQL/mysql/mysqld.cnf
 
 cd /home/administrator
+git init
+
 git clone https://github.com/syncyberE4/Applicatie.git
 
 mkdir publish
@@ -190,29 +214,7 @@ sudo chmod 777 /var/www/dashboard/sass
 #na het schrijven apache herstarten
 sudo service apache2 restart
 
-#instellen van firewall rules
-sudo apt-get install ufw
-
-sudo ufw disable
-
-sudo ufw default deny incoming
-sudo ufw default deny outgoing
-
-sudo ufw allow 22/tcp
-sudo ufw allow 22
-sudo ufw allow 80
-sudo ufw allow 443
-sudo ufw allow 8050
-sudo ufw allow 5000:5001/tcp
-sudo ufw allow 5000:5001/udp
-sudo ufw allow 3306/udp
-sudo ufw allow 3306/tcp
-
-sudo ufw allow out 8050
-sudo ufw allow out 80
-sudo ufw allow out 443
-sudo ufw allow out 3306
-
+#uitgaande icmp pakketten toestaan
 sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT\n-A ufw-before-output -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT"' >> /etc/ufw/before.rules
 
 sudo ufw enable
