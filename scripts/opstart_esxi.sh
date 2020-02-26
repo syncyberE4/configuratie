@@ -149,14 +149,15 @@ sudo chmod 777 /var/www/dashboard
 sudo mkdir /var/www/archief
 sudo chmod 777 /var/www/archief
 
-#alle services starten 
+#alle services starten
+cd /home/administrator/configuratie/scripts
+sudo chmod u+x ./back_end.sh
+sudo chmod u+x ./back_end.service
 cp -r /home/administrator/configuratie/scripts/back_end.service /lib/systemd/system/back_end.service
 #sudo systemctl deamon-start
 sudo systemctl daemon-reload
-sudo systemctl enable back_end.service
-sudo systemctl daemon-reload
 sudo systemctl start back_end.service
-
+sudo systemctl enable back_end.service
 
 
 #de juiste bestanden op de juiste plaats zetten
