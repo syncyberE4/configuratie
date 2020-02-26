@@ -107,7 +107,7 @@ sudo apt-get install ufw
 sudo ufw disable
 
 sudo ufw default deny incoming
-sudo ufw default deny outgoing
+sudo ufw default allow outgoing
 
 sudo ufw allow 22/tcp
 sudo ufw allow 22
@@ -173,7 +173,7 @@ git clone https://github.com/syncyberE4/Applicatie.git
 
 mkdir publish
 chmod 777 publish
-mv Applicatie/publish/* publish
+cp -r Applicatie/publish/* publish
 chmod 777 /home/administrator/publish/*
 rm -r /home/administrator/Applicatie
 
@@ -186,12 +186,12 @@ git clone https://github.com/syncyberE4/html.git
 cd /home/administrator
 
 #verplaatsen van dashboard applicatie
-mv /var/www/html/live-overzicht/* /var/www/dashboard/
+cp -r /var/www/html/live-overzicht/* /var/www/dashboard/
 
 cd /home/administrator
 
 #verplaatsen van archief
-mv /var/www/html/archief-overzicht/* /var/www/archief
+cp -r /var/www/html/archief-overzicht/* /var/www/archief
 
 #verwijderen dubbele bestanden
 rm -r /var/www/html
@@ -224,7 +224,7 @@ sudo chmod 777 /var/www/dashboard/sass
 sudo service apache2 restart
 
 #uitgaande icmp pakketten toestaan
-sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT\n-A ufw-before-output -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT"' >> /etc/ufw/before.rules
+#sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT\n-A ufw-before-output -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT"' >> /etc/ufw/before.rules
 
 sudo ufw enable
 

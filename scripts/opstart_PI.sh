@@ -102,13 +102,13 @@ sudo bash -c 'echo -e "22 11	* * *	root	/home/pi/backup/backup.sh\n39 10	* * *	r
 alias backup='sudo /home/pi/backup/backup.sh'
 sudo chmod u+x /home/pi/backup/backup.sh
 
-#alle services starten 
-cp -r /home/pi/configuratie/scripts/back_end.service /lib/systemd/system/back_end.service
+cp -r /home/administrator/configuratie/scripts/back_end.service /lib/systemd/system/back_end.service
 #sudo systemctl deamon-start
 sudo systemctl daemon-reload
 sudo systemctl enable back_end.service
 sudo systemctl daemon-reload
 sudo systemctl start back_end.service
+
 
 #firewallrules instellen
 sudo apt-get install ufw
@@ -116,7 +116,7 @@ sudo apt-get install ufw
 sudo ufw disable
 
 sudo ufw default deny incoming
-sudo ufw default deny outgoing
+sudo ufw default allow outgoing
 
 sudo ufw allow 22/tcp
 sudo ufw allow 22
@@ -137,7 +137,7 @@ sudo ufw allow out 3306
 crontab -l | { cat; echo "47 10 * * * /usr/local/bin/automysqlbackup /etc/automysqlbackup/myserver.conf"; } | crontab -
 crontab -l | { cat; echo "22 11 * * * /home/pi/backup/backup.sh"; } | crontab -
 
-sudo rm -r /etc/apache2/ports.conf
+sudo rm -rf /etc/apache2/ports.conf
 sudo touch /etc/apache2/ports.conf
 
 #ports apache instellen
@@ -148,9 +148,9 @@ sudo rm /etc/automysqlbackup/myserver.conf
 sudo rm /etc/mysql/mysql.conf.d/mysqld.cnf
 
 #mappen aanmaken + rechten geven
-sudo rm -r /var/www/dashboard
-sudo rm -r /var/www/archief
-sudo rm -r /var/www/Front_end
+sudo rm -rf /var/www/dashboard
+sudo rm -rf/var/www/archief
+sudo rm -rf /var/www/Front_end
 
 sudo mkdir /var/www/dashboard
 sudo chmod 777 /var/www/dashboard
@@ -173,7 +173,7 @@ git clone https://github.com/syncyberE4/Applicatie.git
 
 mkdir publish
 chmod 777 publish
-mv Applicatie/publish/* publish
+cp -r Applicatie/publish/* publish
 chmod 777 /home/pi/publish/*
 rm -r /home/pi/Applicatie
 
@@ -186,12 +186,12 @@ git clone https://github.com/syncyberE4/html.git
 cd /home/pi
 
 #verplaatsen van dashboard applicatie
-mv /var/www/html/live-overzicht/* /var/www/dashboard/
+cp -r /var/www/html/live-overzicht/* /var/www/dashboard/
 
 cd /home/pi
 
 #verplaatsen van archief
-mv /var/www/html/archief-overzicht/* /var/www/archief
+cp -r /var/www/html/archief-overzicht/* /var/www/archief
 
 #verwijderen dubbele bestanden
 rm -r /var/www/html
@@ -224,9 +224,10 @@ sudo chmod 777 /var/www/dashboard/sass
 sudo service apache2 restart
 
 #uitgaande icmp pakketten toestaan
-sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT\n-A ufw-before-output -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT"' >> /etc/ufw/before.rules
+#sudo bash -c 'echo -e "-A ufw-before-output -p icmp -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT\n-A ufw-before-output -p icmp -m state --state ESTABLISHED,RELATED -j ACCEPT"' >> /etc/ufw/before.rules
 
 sudo ufw enable
 
 #back_end automatisch laten starten
 
+sudo reboot now 
