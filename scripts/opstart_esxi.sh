@@ -41,12 +41,12 @@ GRANT ALL PRIVILEGES ON *.* TO 'gregory'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
+#PHP installeren
 sudo apt-get install php libapache2-mod-php -y
 
 #Give rights to apache www folder 
 sudo mkdir /var/www/ 
 sudo chmod -R 777 /var/www/
-
 
 #installatie van PHPMyAdmin
 sudo apt install phpmyadmin php-mbstring php-gettext -y
@@ -62,8 +62,6 @@ sudo systemctl restart apache2
 #mappen aanmaken
 sudo mkdir /home/administrator/backup
 sudo chmod -R 777 /home/administrator/backup
-cd /home/administrator
-sudo rm -r /var/www/*
 
 #create mount point for usb
 sudo mkdir /media/backup
@@ -109,7 +107,7 @@ sudo apt-get install ufw
 sudo ufw disable
 
 sudo ufw default deny incoming
-sudo ufw default allow outgoing
+sudo ufw default deny outgoing
 
 sudo ufw allow 22/tcp
 sudo ufw allow 22
@@ -151,6 +149,13 @@ sudo chmod 777 /var/www/dashboard
 sudo mkdir /var/www/archief
 sudo chmod 777 /var/www/archief
 
+#alle services starten 
+#sudo systemctl deamon-start
+sudo systemctl daemon-reload
+sudo systemctl enable back_end.service
+sudo systemctl daemon-reload
+sudo systemctl start back_end.service
+
 
 #de juiste bestanden op de juiste plaats zetten
 cd /etc/automysqlbackup
@@ -166,7 +171,7 @@ git clone https://github.com/syncyberE4/Applicatie.git
 
 mkdir publish
 chmod 777 publish
-cp -r Applicatie/publish/* publish
+mv Applicatie/publish/* publish
 chmod 777 /home/administrator/publish/*
 rm -r /home/administrator/Applicatie
 
@@ -179,12 +184,12 @@ git clone https://github.com/syncyberE4/html.git
 cd /home/administrator
 
 #verplaatsen van dashboard applicatie
-cp -r /var/www/html/live-overzicht/* /var/www/dashboard/
+mv /var/www/html/live-overzicht/* /var/www/dashboard/
 
 cd /home/administrator
 
 #verplaatsen van archief
-cp -r /var/www/html/archief-overzicht/* /var/www/archief
+mv /var/www/html/archief-overzicht/* /var/www/archief
 
 #verwijderen dubbele bestanden
 rm -r /var/www/html
